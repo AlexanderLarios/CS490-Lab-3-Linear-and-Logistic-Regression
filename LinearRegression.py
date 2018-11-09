@@ -32,12 +32,12 @@ def the_model():
     model = Sequential()
     model.add(Dense(1, input_dim=1, init='normal', activation='relu'))
     model.add(Dense(1, init='normal'))
-    model.compile(loss='mean_squared_error', optimizer='adam')
+    model.compile(loss='mean_squared_error', optimizer='adam', metrics=["accuracy"])
     return model
 model = the_model()
 model.summary()
-epochs = 200
-batch_size =100
+epochs = 500
+batch_size =10
 history = model.fit(x_train, y_train,
     batch_size=batch_size,
     epochs=epochs,
