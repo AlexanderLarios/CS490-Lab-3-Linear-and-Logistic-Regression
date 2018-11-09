@@ -9,15 +9,7 @@ from keras.layers import Dense
 from sklearn.model_selection import train_test_split
 
 auto_data = pd.read_csv('auto-mpg.csv')
-# oceanData = pd.DataFrame(df, columns=[
-#         'T_degC','Salnty'])
-# label_col = 'T_degC'
-# print(oceanData.describe())
-# print(oceanData.columns[oceanData.isnull().any()])
-# oceanData.T_degC = oceanData.T_degC.fillna(value=oceanData.T_degC.mean())
-# print(oceanData.columns[oceanData.isnull().any()])
-# oceanData.Salnty = oceanData.Salnty.fillna(value=oceanData.Salnty.mean())
-# print(oceanData.columns[oceanData.isnull().any()])
+
 print(auto_data.describe())
 print(auto_data.columns[auto_data.isnull().any()])
 auto_data.horsepower = auto_data.horsepower.fillna(value=auto_data.horsepower.mean())
@@ -32,7 +24,7 @@ model.add(Dense(1, init='normal'))
 model.compile(loss='mean_squared_error', optimizer='adam', metrics=["accuracy"])
 
 model.summary()
-epochs = 500
+epochs = 6000
 batch_size =10
 history = model.fit(x_train, y_train,
     batch_size=batch_size,
