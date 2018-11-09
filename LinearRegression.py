@@ -19,18 +19,21 @@ oceanData = pd.DataFrame(df, columns=[
         'T_degC','Salnty'])
 label_col = 'T_degC'
 print(oceanData.describe())
+print(oceanData.columns[oceanData.isnull().any()])
+oceanData.T_degC = oceanData.T_degC.fillna(value=oceanData.T_degC.mean())
+print(oceanData.columns[oceanData.isnull().any()])
+oceanData.Salnty = oceanData.Salnty.fillna(value=oceanData.Salnty.mean())
+print(oceanData.columns[oceanData.isnull().any()])
 
 
 x_train, x_valid, y_train, y_valid = train_test_split(oceanData.iloc[:,0:1], oceanData.iloc[:,1],test_size=0.3, random_state=87)
 np.random.seed(816)
-
 def the_model():
     model = Sequential()
     model.add(Dense(1, input_dim=1, init='normal', activation='relu'))
     model.add(Dense(1, init='normal'))
     model.compile(loss='mean_squared_error', optimizer='adam')
     return model
-
 model = the_model()
 model.summary()
 epochs = 200
@@ -43,14 +46,12 @@ history = model.fit(x_train, y_train,
     validation_data=(x_valid, y_valid),)
 score = model.evaluate(x_valid, y_valid)
 print("test accuracy", score[1])
-
 # Get training and test loss histories
 training_loss = history.history['loss']
 test_loss = history.history['val_loss']
-
-# Create count of the number of epochs
+ # Create count of the number of epochs
 epoch_count = range(1, len(training_loss) + 1)
-
+#
 # Visualize loss history
 plt.plot(epoch_count, training_loss, 'r--')
 plt.plot(epoch_count, test_loss, 'b-')
