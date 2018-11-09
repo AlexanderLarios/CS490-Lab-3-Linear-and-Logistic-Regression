@@ -1,40 +1,36 @@
 from __future__ import print_function
-import os
+
+from time import time
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from keras import metrics
-from keras import regularizers
+from keras.callbacks import TensorBoard
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten, Activation
-from keras.layers import Conv2D, MaxPooling2D
-from keras.optimizers import Adam, RMSprop, Nadam
-from keras.callbacks import TensorBoard, EarlyStopping, ModelCheckpoint
-from keras.utils import plot_model
-from keras.models import load_model
+from keras.layers import Dense
 from sklearn.model_selection import train_test_split
 
-df = pd.read_csv('OceanTempSalinity.csv')
-oceanData = pd.DataFrame(df, columns=[
-        'T_degC','Salnty'])
-label_col = 'T_degC'
-print(oceanData.describe())
-print(oceanData.columns[oceanData.isnull().any()])
-oceanData.T_degC = oceanData.T_degC.fillna(value=oceanData.T_degC.mean())
-print(oceanData.columns[oceanData.isnull().any()])
-oceanData.Salnty = oceanData.Salnty.fillna(value=oceanData.Salnty.mean())
-print(oceanData.columns[oceanData.isnull().any()])
+auto_data = pd.read_csv('auto-mpg.csv')
+# oceanData = pd.DataFrame(df, columns=[
+#         'T_degC','Salnty'])
+# label_col = 'T_degC'
+# print(oceanData.describe())
+# print(oceanData.columns[oceanData.isnull().any()])
+# oceanData.T_degC = oceanData.T_degC.fillna(value=oceanData.T_degC.mean())
+# print(oceanData.columns[oceanData.isnull().any()])
+# oceanData.Salnty = oceanData.Salnty.fillna(value=oceanData.Salnty.mean())
+# print(oceanData.columns[oceanData.isnull().any()])
+print(auto_data.describe())
+print(auto_data.columns[auto_data.isnull().any()])
+auto_data.horsepower = auto_data.horsepower.fillna(value=auto_data.horsepower.mean())
+print(auto_data.columns[auto_data.isnull().any()])
 
-
-x_train, x_valid, y_train, y_valid = train_test_split(oceanData.iloc[:,0:1], oceanData.iloc[:,1],test_size=0.3, random_state=87)
+tensor_board = TensorBoard(log_dir="linear_logs/{}".format(time()))
+x_train, x_valid, y_train, y_valid = train_test_split(auto_data.iloc[:,0:5], auto_data.iloc[:,5],test_size=0.2, random_state=87)
 np.random.seed(816)
-def the_model():
-    model = Sequential()
-    model.add(Dense(1, input_dim=1, init='normal', activation='relu'))
-    model.add(Dense(1, init='normal'))
-    model.compile(loss='mean_squared_error', optimizer='adam', metrics=["accuracy"])
-    return model
-model = the_model()
+model = Sequential()
+model.add(Dense(1, input_dim=5, init='normal'))
+model.add(Dense(1, init='normal'))
+model.compile(loss='mean_squared_error', optimizer='adam', metrics=["accuracy"])
+
 model.summary()
 epochs = 500
 batch_size =10
@@ -43,19 +39,7 @@ history = model.fit(x_train, y_train,
     epochs=epochs,
     shuffle=True,
     verbose=2, # Change it to 2, if wished to observe execution
-    validation_data=(x_valid, y_valid),)
+    validation_data=(x_valid, y_valid), callbacks=[tensor_board])
 score = model.evaluate(x_valid, y_valid)
 print("test accuracy", score[1])
-# Get training and test loss histories
-training_loss = history.history['loss']
-test_loss = history.history['val_loss']
- # Create count of the number of epochs
-epoch_count = range(1, len(training_loss) + 1)
-#
-# Visualize loss history
-plt.plot(epoch_count, training_loss, 'r--')
-plt.plot(epoch_count, test_loss, 'b-')
-plt.legend(['Training Loss', 'Test Loss'])
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.show();
+

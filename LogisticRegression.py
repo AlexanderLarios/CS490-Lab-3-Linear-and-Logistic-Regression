@@ -1,10 +1,10 @@
+from time import time
 import pandas
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from keras.models import Sequential
 from keras.layers import Dense
-import tensorflow
-import tensorboard
+from keras.callbacks import TensorBoard
 
 titanic_data = pandas.read_excel('titanic3.xls', 'titanic3')
 x_train, x_test, y_train, y_test = train_test_split(titanic_data.iloc[:,0:6], titanic_data.iloc[:,6], test_size=0.3, random_state=87)
@@ -23,11 +23,12 @@ x_test.age = x_test.age.fillna(value=filler_age_test)
 filler_fare_test = x_test.fare.median()
 x_test.sex = sex_label.fit_transform(x_test.sex)
 
+tb = TensorBoard(log_dir="logs/{}".format(time()))
 kModel = Sequential()
 kModel.add(Dense(1, input_dim=6, activation='sigmoid'))
 kModel.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy"])
 print(kModel.summary())
-fit_results = kModel.fit(x_train, y_train, batch_size=10, nb_epoch=500, validation_data=(x_test, y_test))
+fit_results = kModel.fit(x_train, y_train, batch_size=10, nb_epoch=500, validation_data=(x_test, y_test), callbacks=[tb])
 score=kModel.evaluate(x_test, y_test)
 
 print("test accuracy", score[1])
