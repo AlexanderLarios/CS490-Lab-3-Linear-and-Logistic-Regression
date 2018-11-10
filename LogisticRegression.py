@@ -23,12 +23,17 @@ x_test.age = x_test.age.fillna(value=filler_age_test)
 filler_fare_test = x_test.fare.median()
 x_test.sex = sex_label.fit_transform(x_test.sex)
 
+# create the tensorboard
 tb = TensorBoard(log_dir="logs/{}".format(time()))
+# create the model
 kModel = Sequential()
 kModel.add(Dense(1, input_dim=6, activation='sigmoid'))
 kModel.compile(optimizer='adam', loss='binary_crossentropy', metrics=["accuracy"])
 print(kModel.summary())
+
+# Train the model
 fit_results = kModel.fit(x_train, y_train, batch_size=10, nb_epoch=500, validation_data=(x_test, y_test), callbacks=[tb])
+
 score=kModel.evaluate(x_test, y_test)
 
 print("test accuracy", score[1])
